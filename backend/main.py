@@ -1,27 +1,22 @@
-import pymongo
 import json
+from datetime import datetime
 
-# Connect to MongoDB inside the Docker container
-client = pymongo.MongoClient("mongodb://localhost:27017/")
-
-# Load JSON data from file
-with open("jsondata.json") as f:
+with open('jsondata.json') as f:
     data = json.load(f)
 
-# Insert data into MongoDB collection
-db = client["mydatabase"]
-collection = db["mycollection"]
-# collection.insert_many(data)
+for item in data:
+    date_string = item["added"]
+    if(item["relevance"]==""):
+        item["relevance"] = 0
+    if(item["impact"]==""):
+        item["impact"] = 0
+    if(item["intensity"]==""):
+        item["intensity"] = 0
+    if(item["likelihood"]==""):
+        item["likelihood"] = 0
+    datetime_obj = datetime.strptime(date_string, "%B, %d %Y %H:%M:%S")
+    epoch_time = int(datetime_obj.timestamp())
+    item["epoch"] = epoch_time
 
-# Print the number of documents in the collection
-# print(f"{collection.count_documents({})} documents in collection")
-
-results = collection.find({"sector":"Energy"})
-
-i = 0
-
-for result in results:
-    i += 1
-    print(result)
-
-print(i)
+with open('jsondata.json', 'w') as f:
+    json.dump(data, f)

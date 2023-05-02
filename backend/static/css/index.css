@@ -10,3 +10,11 @@
     scale: 1.005;
     cursor: pointer;
 }
+
+#chart-container svg{
+    fill: none;
+}
+
+.green {
+    fill:green !important;
+}
