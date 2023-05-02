@@ -4,7 +4,8 @@
 let k = 0;
 
 // initialize the dimensions of the map
-const width = 1700;
+
+const width = 1800;
 const height = 1100;
 
 // create the svg element and append it to the div with id map
