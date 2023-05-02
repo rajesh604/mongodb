@@ -1,9 +1,25 @@
+// This file is used to add the graph to the page
+
+// initialize the counter
 let i = 0;
 let mySet = new Set();
 let option_send;
-// console.log(window.location.href);
 let url = window.location.href;
-// fetch("https://alexanderwar-animated-yodel-9vj4g9w5447377qx-5000.preview.app.github.dev/key_data")
+let countryDictionary = {};
+
+fetch("https://cdn.jsdelivr.net/npm/country-flag-emoji-json@2.0.0/dist/index.json")
+    .then(response => response.json())
+    .then(data => {
+        let length = data.length;
+        for (let i = 0; i < length; i++) {
+            if (data[i].name == "United States") {
+                data[i].name = "United States of America";
+            }
+            countryDictionary[data[i].name] = data[i].emoji;
+        }
+    })
+
+// fetching the data from the api
 fetch(url + "key_data")
     .then((response) => response.json())
     .then((data) => {
@@ -19,9 +35,9 @@ fetch(url + "key_data")
 // when a value is selected in select1, fetch the data from the api and populate select2
 let select2 = document.getElementById("select2");
 
+// fetching the data from the api when a value is selected in select1
 document.getElementById("select1").addEventListener("change", function () {
     let value = this.value;
-    // fetch("https://alexanderwar-animated-yodel-9vj4g9w5447377qx-5000.preview.app.github.dev/data", {
     fetch(url + "data", {
         method: 'POST',
         headers: {
@@ -41,6 +57,7 @@ document.getElementById("select1").addEventListener("change", function () {
         })
 })
 
+// adding the query to fetch when clicked on add button
 document.getElementById("button1").addEventListener("click", function () {
     let results = document.getElementById("select1").value;
     let results1 = document.getElementById("select2").value;
@@ -50,12 +67,14 @@ document.getElementById("button1").addEventListener("click", function () {
     createDiv.innerHTML = results + ":" + results1;
 
     document.getElementById("header").appendChild(createDiv);
-
     // create a button and append it to the div
     let removeButton = document.createElement("button");
     removeButton.innerText = "Remove";
+    removeButton.classList.add("removeButton")
     createDiv.appendChild(removeButton);
+    // can be removed
 
+    // can be removed 
     // when clicked on, remove the above data
     removeButton.addEventListener("click", function () {
         createDiv.remove();
@@ -64,6 +83,7 @@ document.getElementById("button1").addEventListener("click", function () {
     i++;
 });
 
+// when clicked on submit button, send the data to the api
 document.getElementById("button2").addEventListener("click", function () {
     // get all the data from the divs
     // let divs = document.querySelectorAll(".container1 div");
@@ -98,14 +118,14 @@ document.getElementById("button2").addEventListener("click", function () {
     })
         .then((response) => response.json())
         .then((result) => {
-            console.log(result);
+            // console.log(result);
             // convert json object to array
             let data = Object.values(result);
 
             // Define the dimensions of the chart
             var margin = { top: 20, right: 20, bottom: 30, left: 40 },
-                width = 1800 - margin.left - margin.right,
-                height = 700 - margin.top - margin.bottom;
+                width = 1900 - margin.left - margin.right,
+                height = 1000 - margin.top - margin.bottom;
             // d3.select("div.backend svg").remove();
             d3.select("div.backend").selectAll("svg").remove();
             d3.select("div.backend").append("svg");
@@ -205,14 +225,22 @@ document.getElementById("button2").addEventListener("click", function () {
                 .attr("dy", ".35em")
                 .style("text-anchor", "end")
                 .text(function (d) { return d; });
-            // })
 
-            // svg.append("g")
-            //     .attr("transform", "translate(0," + height + ")")
-            //     .call(d3.axisBottom(x))
-            //     .selectAll("text")
-            //     .attr("transform", "rotate(-45)")
-            //     .style("text-anchor", "end");
+            // delete the below code
+            svg.append("text")
+                .attr("x", width / 2)
+                .attr("y", height + margin.bottom)
+                .attr("text-anchor", "middle")
+                .text("Dates");
+
+            svg.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("x", 0 - height / 2)
+                .attr("y", 0 - margin.left + 15)
+                .attr("text-anchor", "middle")
+                .text("number");
+            // delete the above code
+            // })
 
             // Set the dimensions and margins of the graph
             var margin = { top: 200, right: 80, bottom: 30, left: 50 },
@@ -316,7 +344,6 @@ document.getElementById("button2").addEventListener("click", function () {
                 .attr("stroke-width", 2)
                 .attr("d", relevanceLine);
 
-            // delete
             // Add the count line label
             svg.append("text")
                 .datum(data)
@@ -366,18 +393,38 @@ document.getElementById("button2").addEventListener("click", function () {
                 .style("text-anchor", "middle")
                 .style("fill", "orange")
                 .text("Relevance");
-            // delete
 
+            // getting the elements with country class
             let resulting = document.getElementsByClassName("country")
+            // let emojiList = []
+            const mySet = new Set();
+            // create an empty set
 
-            for (let i = 0; i < resulting.length; i++) {
-                resulting[i].classList.remove("green")
-                for (let j = 0; j < data.length; j++) {
-                    if (resulting[i].innerHTML == data[j].country) {
-                        resulting[i].classList.add("green")
+            let selector = document.getElementById("data")
+            let resultingLength = resulting.length
+            let dataLength = data.length
+
+            // adding the green class to the elements with the country name
+            for (let i = 0; i < resultingLength; i++) {
+                let element = resulting[i]
+                element.classList.remove("green")
+                for (let j = 0; j < dataLength; j++) {
+                    if (element.innerHTML == data[j].country) {
+                        element.classList.add("green")
+                        mySet.add(element.innerHTML + " " + countryDictionary[element.innerHTML])
                     }
                 }
             }
-        })
+            
+            // delete the divs of the selector
+            while (selector.firstChild) {
+                selector.removeChild(selector.firstChild);
+            }
 
+            for (let item of mySet) {
+                let newDiv = document.createElement("div")
+                newDiv.innerHTML = item
+                selector.appendChild(newDiv)
+            }
+        });
 })
