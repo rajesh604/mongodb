@@ -4,6 +4,7 @@
 let k = 0;
 
 // initialize the dimensions of the map
+
 const width = 1800;
 const height = 1100;
 
@@ -14,8 +15,8 @@ const svg = d3.select('#map').append('svg').attr('width', width).attr('height', 
 const g = svg.append('g');
 
 // create the projection and the path
-const projection = d3.geoMercator().scale(190)
-    .translate([width / 2, height / 2]);
+const projection = d3.geoMercator().scale(180)
+    .translate([width / 2, height / 1.9]);
 const path = d3.geoPath(projection);
 
 // load the data from the json file
@@ -45,10 +46,10 @@ d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
             .text(function (d) {
                 return d.properties.name;
             });
-        
+
         // creating the array of country class elements
         let arr = document.getElementsByClassName('country');
-      
+
         Array.from(countries.features).forEach((country) => {
             array.push(country.properties.name);
         })
@@ -73,4 +74,17 @@ d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
                 console.log(e.target.innerHTML);
             })
         })
+        svg.append("rect")
+            .attr("x", 10)
+            .attr("y", 150)
+            .attr("width", 20)
+            .attr("height", 20)
+            .style("fill", "green");
+
+        svg.append("text")
+            .attr("x", 35)
+            .attr("y", 170)
+            .attr("class", "legend")
+            .text("Selected Countries");
+
     });
